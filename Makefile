@@ -6,7 +6,7 @@
 #    By: sarayapa <sarayapa@student.42bangkok.co    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/29 17:32:46 by sarayapa          #+#    #+#              #
-#    Updated: 2025/11/28 16:27:01 by sarayapa         ###   ########.fr        #
+#    Updated: 2025/12/04 18:38:39 by sarayapa         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -60,7 +60,7 @@ clean:
 	rm -rf $(BUILD)
 
 fclean: clean
-	rm -f $(NAME) valgrind.rpt
+	rm -f $(NAME) valgrind.rpt a.out input output pipex
 
 re:fclean all
 
