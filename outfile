@@ -1,0 +1,16 @@
+42_pipex_tester
+build
+libft.a
+libft.h
+ls
+main.c
+Makefile
+old_pipex.c
+out
+outfile
+pipex
+pipex.c
+pipex_utils.c
+README.md
+sources
+subject

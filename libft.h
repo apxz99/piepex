@@ -6,7 +6,7 @@
 /*   By: sarayapa <sarayapa@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/29 17:14:39 by sarayapa          #+#    #+#             */
-/*   Updated: 2025/12/19 03:55:41 by sarayapa         ###   ########.fr       */
+/*   Updated: 2025/12/19 06:17:12 by sarayapa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,10 +83,12 @@ typedef struct s_list
 
 typedef struct s_pipex
 {
+	char	**av;
 	int		pid[2];
 	int		pipefd[2];
 	int		infile;
 	int		outfile;
+	int		status;
 	char	**envp;
 	char	**cmd1;
 	char	**cmd2;

@@ -87,7 +87,7 @@ void do_command_1(t_pipex *px)
 		close(px->outfile);
 		execve(px->cmd1[0], px->cmd1, px->envp);
 		ft_free(px->cmd1);
-		exit(127);
+		exit(1);
 	}
 }
 
@@ -104,19 +104,24 @@ void do_command_2(t_pipex *px)
 		close(px->outfile);
 		execve(px->cmd2[0], px->cmd2, px->envp);
 		ft_free(px->cmd2);
-		exit(127);
+		exit(1);
 	}
 }
 
 void	init_pipex(int ac, char **av, char **envp, t_pipex *px)
 {
+	px->av = av;
 	px->envp = envp;
 	if(ac != 5 || !av[1] || !av[4])
-		exit(0);
-	px->infile = open(av[1], O_RDONLY);
-	px->outfile = open(av[4], O_WRONLY | O_CREAT | O_TRUNC ,0644);
-	if(px->infile == -1 || px->outfile == -1)
 		exit(1);
+	px->infile = open(av[1], O_RDONLY);
+	if(access(av[1], R_OK) != 0)
+		px->infile = open("/dev/null", O_RDONLY);
+	if(px->infile == -1)
+		perror("infile");
+	px->outfile = open(av[4], O_WRONLY | O_CREAT | O_TRUNC ,0644);
+	if(access(av[4], W_OK) != 0)
+		px->infile = open("/dev/null", O_WRONLY);
 	if(pipe(px->pipefd) == -1)
 		exit(1);
 	px->cmd1 = format_argv(av[2], px->envp);
@@ -126,7 +131,7 @@ void	init_pipex(int ac, char **av, char **envp, t_pipex *px)
 		close(px->outfile);
 		close(px->pipefd[0]);
 		close(px->pipefd[1]);
-		exit(127);
+		exit(0);
 	}
 	px->cmd2 = format_argv(av[3], px->envp);
 	if(!px->cmd2)
@@ -144,6 +149,8 @@ void	ft_free(char **strs)
 	int	i;
 
 	i = 0;
+	if(!strs)
+		return;
 	while (strs[i])
 	{
 		free(strs[i]);
@@ -152,6 +159,7 @@ void	ft_free(char **strs)
 	free(strs);
 }
 
+
 int main(int ac, char **av, char **envp)
 {
 	t_pipex	px;
@@ -159,17 +167,20 @@ int main(int ac, char **av, char **envp)
 	init_pipex(ac, av, envp, &px);
 
 	do_command_1(&px);
+	close(px.pipefd[1]);
+
 	do_command_2(&px);
 
 	close(px.pipefd[0]);
-	close(px.pipefd[1]);
 	close(px.infile);
 	close(px.outfile);
 
 	waitpid(px.pid[0], NULL, 0);
-	waitpid(px.pid[1], NULL, 0);
+	waitpid(px.pid[1], &px.status, 0);
 	ft_free(px.cmd1);
 	ft_free(px.cmd2);
-	return (0);
+	if(access(px.av[4], W_OK) != 0)
+		exit(1);
+	return (px.status / 256);
 }
-//# 2: "infiles/basic.txt" "ls -la" "cat -e" "outfiles/outfile"                             [KO]    [OK]    [OK]    [OK]
+// "infiles/basic.txt" "cat -e" "grep nonexistingword" "outfiles/nonexistingfile"       [OK]    [KO]    [OK]    [OK]
